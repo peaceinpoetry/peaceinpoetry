@@ -1,0 +1,442 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Peace in Poetry</title>
+    
+    <!-- Tailwind CSS for styling -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Google Fonts for a classic, book-like feel -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+    
+    <style>
+        /* Custom styles */
+        body {
+            background-color: #000;
+            color: #e0e0e0;
+            font-family: 'Lora', serif; /* Classic book/newspaper font */
+            overflow-x: hidden;
+        }
+        
+        /* Canvas for the dynamic background */
+        #particle-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1; /* Place it behind all other content */
+        }
+        
+        /* Style for the fade-in animation on scroll */
+        .fade-in-section {
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity 0.8s ease-out, transform 0.8s ease-out;
+        }
+        
+        .fade-in-section.is-visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* Custom styling for poem stanzas */
+        .poem-stanza {
+            margin-bottom: 1.5rem; /* Space between stanzas */
+        }
+
+        /* --- STYLES FOR DYNAMIC BOXES (3D TILT VERSION) --- */
+        #dynamic-boxes-container {
+            display: flex;
+            flex-wrap: wrap; /* Allow wrapping on smaller screens */
+            gap: 1rem;
+            min-height: 200px; 
+            perspective: 1000px; /* Create a 3D space for the child elements */
+        }
+
+        .dynamic-box {
+            flex: 1;
+            min-width: 200px; /* Minimum width for boxes before wrapping */
+            border-radius: 0.5rem;
+            padding: 2rem;
+            cursor: pointer;
+            position: relative;
+            background-color: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            transform-style: preserve-3d; /* Enable 3D transformations */
+            transition: transform 0.1s linear, box-shadow 0.3s ease;
+            color: inherit; /* Ensure link inherits text color */
+            text-decoration: none; /* Remove underline from link */
+        }
+        
+        .dynamic-box:hover {
+            box-shadow: 0 15px 30px rgba(0,0,0,0.3);
+        }
+
+        .box-content {
+            transform: translateZ(20px); /* Push content slightly forward in 3D space */
+        }
+        
+        .box-title {
+            color: #fff;
+            font-size: 1.5rem;
+            font-weight: bold;
+        }
+
+        .box-description {
+            color: #ccc;
+            margin-top: 0.5rem;
+        }
+
+    </style>
+</head>
+<body class="bg-black">
+
+    <!-- The canvas element for our dynamic background -->
+    <canvas id="particle-canvas"></canvas>
+
+    <!-- Navigation Bar -->
+    <nav class="fixed top-0 left-0 right-0 z-20 bg-black bg-opacity-50 backdrop-blur-sm fade-in-section">
+        <div class="container mx-auto flex justify-between items-center p-4">
+            <!-- Logo and Site Name -->
+            <a href="#" class="flex items-center space-x-3">
+                <!-- SVG Logo: A stylized quill -->
+                <svg class="w-12 h-12 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M20.66 10.66c-1.11-3.33-3.78-5.66-7.16-5.66-4.42 0-8 3.58-8 8 0 1.58.46 3.03 1.24 4.26"></path>
+                    <path d="M14 14.74c-2.09-.96-3.74-2.61-4.7-4.7"></path>
+                    <path d="M4 20l4-4"></path>
+                    <path d="M15 11l5 5"></path>
+                </svg>
+                <span class="text-white text-3xl font-semibold" style="font-family: 'Lora', serif;">peaceinpoetry.com</span>
+            </a>
+            
+            <!-- Menu for Desktop -->
+            <div class="hidden md:flex items-center space-x-8">
+                <a href="#" class="text-gray-300 hover:text-white transition-colors duration-300">Home</a>
+                <a href="#" class="text-gray-300 hover:text-white transition-colors duration-300">Blog</a>
+            </div>
+
+            <!-- Mobile Menu Button -->
+            <div class="md:hidden">
+                <button id="mobile-menu-button" class="text-white focus:outline-none">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path></svg>
+                </button>
+            </div>
+        </div>
+        <!-- Mobile Menu (hidden by default) -->
+        <div id="mobile-menu" class="hidden md:hidden px-4 pb-4">
+            <a href="#" class="block text-gray-300 hover:text-white py-2 text-center">Home</a>
+            <a href="#" class="block text-gray-300 hover:text-white py-2 text-center">Blog</a>
+        </div>
+    </nav>
+
+    <!-- Main content container, with padding-top to avoid overlap with nav -->
+    <div class="relative z-10 container mx-auto px-6 pt-32 sm:pt-40 pb-24 sm:pb-32">
+
+        <!-- Header Section -->
+        <header class="text-center mb-24 fade-in-section">
+            <!-- DYNAMIC BOXES CONTAINER -->
+            <div id="dynamic-boxes-container" class="w-full">
+                <!-- Box 1 -->
+                <a href="files/poems/character1.html" target="_self" rel="noopener noreferrer" class="dynamic-box">
+                    <div class="box-content">
+                        <h3 class="box-title">Character #1</h3>
+                        <p class="box-description">"The Path OR The Gorge"<br>A Dilemma</p>
+                    </div>
+                </a>
+                <!-- Box 2 -->
+                <a href="https://www.peaceinpoetry.com" target="_blank" rel="noopener noreferrer" class="dynamic-box">
+                    <div class="box-content">
+                        <h3 class="box-title">Discover Poets</h3>
+                        <p class="box-description">Learn about timeless poets and contemporary voices shaping the art.</p>
+                    </div>
+                </a>
+                <!-- Box 3 -->
+                <a href="https://www.peaceinpoetry.com" target="_blank" rel="noopener noreferrer" class="dynamic-box">
+                    <div class="box-content">
+                        <h3 class="box-title">Join Community</h3>
+                        <p class="box-description">Connect with fellow poetry lovers and share your own creations.</p>
+                    </div>
+                </a>
+                <!-- Box 4 -->
+                <a href="https://www.peaceinpoetry.com" target="_blank" rel="noopener noreferrer" class="dynamic-box">
+                    <div class="box-content">
+                        <h3 class="box-title">Read the Blog</h3>
+                        <p class="box-description">Find analysis, writing prompts, and reflections on the power of words.</p>
+                    </div>
+                </a>
+            </div>
+        </header>
+
+		<!----------------------------------------------------------------------------------------------------------->
+		<!----------------------------------------------------------------------------------------------------------->
+		<!----------------------------------------------------------------------------------------------------------->
+		
+		
+        <!-- Poems Section -->
+        <head>
+    <style>
+        /* * The Grid Container (image-grid)
+         * This lays out the image items in a responsive row.
+        */
+        .image-grid {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 1.5rem; /* 24px */
+            padding: 1rem;
+        }
+
+        /* * The Image Container
+         * This wrapper holds an image and its text overlay.
+        */
+        .image-container {
+            position: relative; /* Crucial for positioning the overlay inside */
+            flex: 1 1 250px;   /* Flex properties for responsive sizing */
+            max-width: 250px;
+            cursor: pointer;
+            border-radius: 8px; /* Matches the image's border-radius */
+            overflow: hidden;   /* Keeps the overlay within the rounded corners */
+        }
+
+        /* * The Image Itself
+         * Fades smoothly on hover.
+        */
+        .image-container img {
+            display: block;
+            width: 100%;
+            height: auto;
+            border-radius: 8px;
+            transition: opacity 0.3s ease-in-out;
+        }
+
+        /* * The Text Overlay
+         * Covers the container and is hidden by default.
+        */
+        .overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            color: white;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            opacity: 0; /* Hidden by default */
+            transition: opacity 0.3s ease-in-out;
+            padding: 1rem;
+        }
+
+        /* * The Hover Effect
+         * When hovering over the container, the image fades and the overlay appears.
+        */
+        .image-container:hover img {
+            opacity: 0.4; /* Fades the image */
+        }
+
+        .image-container:hover .overlay {
+            opacity: 1; /* Shows the overlay */
+        }
+    </style>
+</head>
+<body>
+    <main class="max-w-7xl mx-auto space-y-20">
+        <div class="image-grid">
+
+            <div class="image-container">
+                <img src="files/special-ed/chapter1/chapter1.webp" alt="Chapter 1 Image"/>
+                <div class="overlay">
+                    <p>Chapter#1:<br> The Last Warm Breath</p>
+                </div>
+            </div>
+
+            <div class="image-container">
+                <img src="files/special-ed/chapter2/chapter2.webp" alt="Chapter 2 Image"/>
+                <div class="overlay">
+                    <p>Chapter#2:<br> What Really Matters?</p>
+                </div>
+            </div>
+
+            <div class="image-container">
+                <img src="https://placehold.co/250x350/B4A99D/333333?text=coming soon.." alt="Placeholder Image"/>
+                <div class="overlay">
+                    <p>Coming Soon</p>
+                </div>
+            </div>
+
+            <div class="image-container">
+                <img src="https://placehold.co/250x350/66717E/FFFFFF?text=coming soon.." alt="Placeholder Image"/>
+                <div class="overlay">
+                    <p>Coming Soon</p>
+                </div>
+            </div>
+
+        </div>
+    </main>
+</body>
+		
+		
+		<!----------------------------------------------------------------------------------------------------------->
+		<!----------------------------------------------------------------------------------------------------------->
+		<!----------------------------------------------------------------------------------------------------------->	
+		
+        <!-- Footer -->
+        <footer class="text-center mt-32 fade-in-section">
+            <p class="text-gray-500">&copy; 2024 : www.peaceinpoetry.com. All rights reserved.</p>
+        </footer>
+
+    </div>
+
+    <script>
+        // --- MOBILE MENU TOGGLE SCRIPT ---
+        const mobileMenuButton = document.getElementById('mobile-menu-button');
+        const mobileMenu = document.getElementById('mobile-menu');
+
+        mobileMenuButton.addEventListener('click', () => {
+            mobileMenu.classList.toggle('hidden');
+        });
+
+        // --- DYNAMIC PARTICLE BACKGROUND SCRIPT ---
+        const canvas = document.getElementById('particle-canvas');
+        const ctx = canvas.getContext('2d');
+        let particlesArray;
+
+        function setCanvasSize() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+        setCanvasSize();
+
+        class Particle {
+            constructor() {
+                this.x = Math.random() * canvas.width;
+                this.y = Math.random() * canvas.height;
+                this.size = Math.random() * 1.5 + 0.5;
+                this.speedX = Math.random() * 1 - 0.5;
+                this.speedY = Math.random() * 1 - 0.5;
+                this.color = 'rgba(200, 200, 200, 0.5)';
+            }
+            update() {
+                this.x += this.speedX;
+                this.y += this.speedY;
+                if (this.x > canvas.width || this.x < 0) this.speedX *= -1;
+                if (this.y > canvas.height || this.y < 0) this.speedY *= -1;
+            }
+            draw() {
+                ctx.fillStyle = this.color;
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                ctx.fill();
+            }
+        }
+
+        function init() {
+            particlesArray = [];
+            let numberOfParticles = (canvas.height * canvas.width) / 9000;
+            for (let i = 0; i < numberOfParticles; i++) {
+                particlesArray.push(new Particle());
+            }
+        }
+        init();
+
+        function animate() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            for (let i = 0; i < particlesArray.length; i++) {
+                particlesArray[i].update();
+                particlesArray[i].draw();
+            }
+            connect();
+            requestAnimationFrame(animate);
+        }
+        animate();
+
+        function connect() {
+            let opacityValue = 1;
+            for (let a = 0; a < particlesArray.length; a++) {
+                for (let b = a; b < particlesArray.length; b++) {
+                    let distance = ((particlesArray[a].x - particlesArray[b].x) * (particlesArray[a].x - particlesArray[b].x)) +
+                                   ((particlesArray[a].y - particlesArray[b].y) * (particlesArray[a].y - particlesArray[b].y));
+                    if (distance < (canvas.width / 7) * (canvas.height / 7)) {
+                        opacityValue = 1 - (distance / 20000);
+                        ctx.strokeStyle = `rgba(200, 200, 200, ${opacityValue})`;
+                        ctx.lineWidth = 0.5;
+                        ctx.beginPath();
+                        ctx.moveTo(particlesArray[a].x, particlesArray[a].y);
+                        ctx.lineTo(particlesArray[b].x, particlesArray[b].y);
+                        ctx.stroke();
+                    }
+                }
+            }
+        }
+
+        // --- FADE-IN ON SCROLL SCRIPT ---
+        const sections = document.querySelectorAll('.fade-in-section');
+        const observerOptions = {
+            root: null,
+            rootMargin: '0px',
+            threshold: 0.1
+        };
+        const observer = new IntersectionObserver((entries, observer) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('is-visible');
+                    observer.unobserve(entry.target);
+                }
+            });
+        }, observerOptions);
+        sections.forEach(section => {
+            observer.observe(section);
+        });
+
+        // --- 3D TILT BOXES SCRIPT ---
+        const boxes = document.querySelectorAll('.dynamic-box');
+
+        boxes.forEach(box => {
+            box.addEventListener('mousemove', (e) => {
+                const rect = box.getBoundingClientRect();
+                const x = e.clientX - rect.left; // x position within the element.
+                const y = e.clientY - rect.top;  // y position within the element.
+
+                const { width, height } = rect;
+                
+                // The amount of rotation, from -15 to 15 degrees
+                const rotateY = (x / width - 0.5) * -30; // -15 to 15
+                const rotateX = (y / height - 0.5) * 30; // 15 to -15
+
+                box.style.transform = `rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale3d(1.05, 1.05, 1.05)`;
+            });
+
+            box.addEventListener('mouseleave', () => {
+                // Reset the transform when the mouse leaves
+                box.style.transition = 'transform 0.5s ease'; // Add a smooth transition for reset
+                box.style.transform = 'rotateX(0) rotateY(0) scale3d(1, 1, 1)';
+            });
+
+            box.addEventListener('mouseenter', () => {
+                // Remove the reset transition to make hover effect immediate
+                box.style.transition = 'transform 0.1s linear';
+            });
+        });
+
+
+        // Re-initialize canvas on window resize
+        window.addEventListener('resize', () => {
+            setCanvasSize();
+            init();
+        });
+    </script>
+
+</body>
+</html>
