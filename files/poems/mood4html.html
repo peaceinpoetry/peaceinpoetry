@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Peace in Poetry</title>
+    
+    <!-- Tailwind CSS for styling -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Google Fonts for a classic, book-like feel -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+    
+    <style>
+        /* Custom styles */
+        body {
+            background-color: #000;
+            color: #e0e0e0;
+            font-family: 'Lora', serif; /* Classic book/newspaper font */
+            overflow-x: hidden;
+        }
+        
+        /* Canvas for the dynamic background */
+        #particle-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1; /* Place it behind all other content */
+        }
+        
+        /* Style for the fade-in animation on scroll */
+        .fade-in-section {
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity 0.8s ease-out, transform 0.8s ease-out;
+        }
+        
+        .fade-in-section.is-visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* Custom styling for poem stanzas */
+        .poem-stanza {
+            margin-bottom: 1.5rem; /* Space between stanzas */
+        }
+    </style>
+</head>
+<body class="bg-black">
+
+    <!-- The canvas element for our dynamic background -->
+    <canvas id="particle-canvas"></canvas>
+
+    <!-- Navigation Bar -->
+    <nav class="fixed top-0 left-0 right-0 z-20 bg-black bg-opacity-50 backdrop-blur-sm fade-in-section">
+        <div class="container mx-auto flex justify-between items-center p-4">
+            <!-- Logo and Site Name -->
+            <a href="/" target="_self" class="flex items-center space-x-3">
+                <!-- SVG Logo: A stylized quill -->
+                <svg class="w-12 h-12 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M20.66 10.66c-1.11-3.33-3.78-5.66-7.16-5.66-4.42 0-8 3.58-8 8 0 1.58.46 3.03 1.24 4.26"></path>
+                    <path d="M14 14.74c-2.09-.96-3.74-2.61-4.7-4.7"></path>
+                    <path d="M4 20l4-4"></path>
+                    <path d="M15 11l5 5"></path>
+                </svg>
+                <span class="text-white text-3xl font-semibold" style="font-family: 'Lora', serif;">peaceinpoetry.com</span>
+            </a>
+            
+            <!-- Menu for Desktop -->
+            <div class="hidden md:flex items-center space-x-8">
+                <a href="/" class="text-xl text-gray-300 hover:text-white transition-colors duration-300">Home</a>
+                <a href="#" class="text-xl text-gray-300 hover:text-white transition-colors duration-300">Blog</a>
+            </div>
+
+            <!-- Mobile Menu Button -->
+            <div class="md:hidden">
+                <button id="mobile-menu-button" class="text-white focus:outline-none">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path></svg>
+                </button>
+            </div>
+        </div>
+        <!-- Mobile Menu (hidden by default) -->
+        <div id="mobile-menu" class="hidden md:hidden px-4 pb-4">
+            <a href="/" class="text-lg block text-gray-300 hover:text-white py-2 text-center">Home</a>
+            <a href="#" class="text-lg block text-gray-300 hover:text-white py-2 text-center">Blog</a>
+        </div>
+    	</nav>
+
+    <!-- Main content container, with padding-top to avoid overlap with nav -->
+    <div class="relative z-10 container mx-auto px-6 pt-32 sm:pt-40 pb-24 sm:pb-32">
+
+        <!-- Header Section -->
+
+
+        <!-- Poems Section -->
+        <main class="max-w-lg mx-auto space-y-20">
+		
+            <!-- Poem 1 -->
+            <article class="fade-in-section">
+                <h2 class="text-2xl font-bold mb-6 text-gray-200 text-left">Mood #4: Care-Less to Fate</h2>
+                <div class="text-lg leading-relaxed text-gray-300 text-left">
+                    <div class="poem-stanza">
+                    <div class="poem-stanza">
+Let life play its card,<br>
+Thinking too much is absurd.<br>
+Take no goal, just walk along,<br>
+Don't wait for anything far too long.<br>
+This is the truth and can't be denied;<br>
+So at least before passing, you can't say you haven't tried.<br>
+<br>
+There's far too much pain if it's not ignored,<br>
+So just forget it as if you snored.<br>
+Don't cry for the cards you are supplied,<br>
+But don't let the well of your tears run dry.<br>
+<br>
+So, let life play its card,<br>
+Thinking too much is always absurd.<br>
+<br>
+<br>
+<br>
+RR~ 03032019
+
+</div>
+
+                </div>  
+            </article>
+
+        </main>
+        
+        <!-- Footer -->
+        <footer class="text-center mt-32 fade-in-section">
+            <p class="text-gray-500">&copy; 2024 | www.peaceinpoetry.com | All rights reserved.</p>
+        </footer>
+
+    </div>
+
+    <script>
+        // --- MOBILE MENU TOGGLE SCRIPT ---
+        const mobileMenuButton = document.getElementById('mobile-menu-button');
+        const mobileMenu = document.getElementById('mobile-menu');
+
+        mobileMenuButton.addEventListener('click', () => {
+            mobileMenu.classList.toggle('hidden');
+        });
+
+        // --- DYNAMIC PARTICLE BACKGROUND SCRIPT ---
+        const canvas = document.getElementById('particle-canvas');
+        const ctx = canvas.getContext('2d');
+
+        let particlesArray;
+
+        // Set canvas size to fill the window
+        function setCanvasSize() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+        setCanvasSize();
+
+        // Particle class
+        class Particle {
+            constructor() {
+                this.x = Math.random() * canvas.width;
+                this.y = Math.random() * canvas.height;
+                this.size = Math.random() * 1.5 + 0.5;
+                this.speedX = Math.random() * 1 - 0.5;
+                this.speedY = Math.random() * 1 - 0.5;
+                this.color = 'rgba(200, 200, 200, 0.5)';
+            }
+            update() {
+                this.x += this.speedX;
+                this.y += this.speedY;
+
+                // Wrap particles around the screen
+                if (this.x > canvas.width || this.x < 0) this.speedX *= -1;
+                if (this.y > canvas.height || this.y < 0) this.speedY *= -1;
+            }
+            draw() {
+                ctx.fillStyle = this.color;
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                ctx.fill();
+            }
+        }
+
+        // Initialize particles
+        function init() {
+            particlesArray = [];
+            let numberOfParticles = (canvas.height * canvas.width) / 9000;
+            for (let i = 0; i < numberOfParticles; i++) {
+                particlesArray.push(new Particle());
+            }
+        }
+        init();
+
+        // Animation loop
+        function animate() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            for (let i = 0; i < particlesArray.length; i++) {
+                particlesArray[i].update();
+                particlesArray[i].draw();
+            }
+            connect();
+            requestAnimationFrame(animate);
+        }
+        animate();
+
+        // Connect particles with lines
+        function connect() {
+            let opacityValue = 1;
+            for (let a = 0; a < particlesArray.length; a++) {
+                for (let b = a; b < particlesArray.length; b++) {
+                    let distance = ((particlesArray[a].x - particlesArray[b].x) * (particlesArray[a].x - particlesArray[b].x)) +
+                                 ((particlesArray[a].y - particlesArray[b].y) * (particlesArray[a].y - particlesArray[b].y));
+                    if (distance < (canvas.width / 7) * (canvas.height / 7)) {
+                        opacityValue = 1 - (distance / 20000);
+                        ctx.strokeStyle = `rgba(200, 200, 200, ${opacityValue})`;
+                        ctx.lineWidth = 0.5;
+                        ctx.beginPath();
+                        ctx.moveTo(particlesArray[a].x, particlesArray[a].y);
+                        ctx.lineTo(particlesArray[b].x, particlesArray[b].y);
+                        ctx.stroke();
+                    }
+                }
+            }
+        }
+
+        // --- FADE-IN ON SCROLL SCRIPT ---
+        const sections = document.querySelectorAll('.fade-in-section');
+
+        const observerOptions = {
+            root: null,
+            rootMargin: '0px',
+            threshold: 0.1
+        };
+
+        const observer = new IntersectionObserver((entries, observer) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('is-visible');
+                    observer.unobserve(entry.target); // Stop observing once it's visible
+                }
+            });
+        }, observerOptions);
+
+        sections.forEach(section => {
+            observer.observe(section);
+        });
+
+        // Re-initialize canvas on window resize
+        window.addEventListener('resize', () => {
+            setCanvasSize();
+            init();
+        });
+    </script>
+
+</body>
+</html>
